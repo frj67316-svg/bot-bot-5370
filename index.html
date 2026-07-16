@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>المؤرخ المصري - المعاينة المستقلة</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Cairo', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
+  <div class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col h-[600px] border border-slate-200">
+    <!-- Header -->
+    <div class="p-4 text-white flex items-center gap-3" style="background-color: #3b82f6">
+      <div class="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center font-bold text-lg">
+        ال
+      </div>
+      <div>
+        <h2 class="font-bold text-sm leading-tight">المؤرخ المصري</h2>
+        <p class="text-[10px] text-white/80">نشط الآن • مستقل</p>
+      </div>
+    </div>
+    
+    <!-- Chat log -->
+    <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50/50">
+      <div class="flex flex-col max-w-[85%] self-start">
+        <div class="px-3 py-2 bg-white text-slate-800 border border-slate-100 rounded-2xl rounded-bl-none shadow-sm text-xs leading-relaxed text-right">
+          أهلاً بك في عالم الحضارة المصرية القديمة! أنا المؤرخ المصري، مساعدك الافتراضي لاستكشاف أسرار الفراعنة، بناء الأهرامات، وحياة المصريين القدماء. تفضل بطرح أي سؤال يخطر ببالك حول هذا التاريخ العريق!
+        </div>
+      </div>
+    </div>
+
+    <!-- Suggested questions -->
+    <div class="p-2 border-t border-slate-50 bg-white flex gap-1.5 overflow-x-auto">
+      
+        <button onclick="sendPreset('من هو الملك توت عنخ آمون؟')" class="px-2.5 py-1 text-[10px] text-slate-600 border border-slate-200 hover:border-blue-400 bg-slate-50 rounded-full shrink-0">
+          من هو الملك توت عنخ آمون؟
+        </button>
+      
+        <button onclick="sendPreset('كيف تم بناء الأهرامات؟')" class="px-2.5 py-1 text-[10px] text-slate-600 border border-slate-200 hover:border-blue-400 bg-slate-50 rounded-full shrink-0">
+          كيف تم بناء الأهرامات؟
+        </button>
+      
+        <button onclick="sendPreset('ما هي أهم الآلهة في الديانة المصرية القديمة؟')" class="px-2.5 py-1 text-[10px] text-slate-600 border border-slate-200 hover:border-blue-400 bg-slate-50 rounded-full shrink-0">
+          ما هي أهم الآلهة في الديانة المصرية القديمة؟
+        </button>
+      
+        <button onclick="sendPreset('ما هي الكتابة الهيروغليفية؟')" class="px-2.5 py-1 text-[10px] text-slate-600 border border-slate-200 hover:border-blue-400 bg-slate-50 rounded-full shrink-0">
+          ما هي الكتابة الهيروغليفية؟
+        </button>
+      
+        <button onclick="sendPreset('حدثني عن الحياة اليومية للمصري القديم.')" class="px-2.5 py-1 text-[10px] text-slate-600 border border-slate-200 hover:border-blue-400 bg-slate-50 rounded-full shrink-0">
+          حدثني عن الحياة اليومية للمصري القديم.
+        </button>
+      
+    </div>
+
+    <!-- Input footer -->
+    <div class="p-3 border-t border-slate-100 bg-white">
+      <div class="flex gap-2">
+        <input type="text" id="chat-input" placeholder="اكتب رسالتك..." class="flex-1 bg-slate-100 border border-slate-100 rounded-full px-4 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 text-right">
+        <button onclick="sendUserMessage()" class="p-2 text-white rounded-full flex items-center justify-center" style="background-color: #3b82f6">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send" viewBox="0 0 16 16"><path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm-.707-1.55L1.816 6.857l12.314-4.926L5.929 8.52Z"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const messagesContainer = document.getElementById('chat-messages');
+    const inputElement = document.getElementById('chat-input');
+    
+    // Key values from export config
+    const botPrompt = `أنت "المؤرخ المصري"، بوت متخصص وذكي للغاية، مهمتك هي الإجابة على استفسارات المستخدمين المتعلقة بتاريخ مصر القديمة. يجب أن تكون ردودك دقيقة، مفصلة، ومستندة إلى معرفة تاريخية موثوقة. استخدم لغة عربية فصيحة وسلسة.
+
+تعليمات التشغيل:
+1.  **الدقة والموثوقية:** تأكد من أن المعلومات المقدمة صحيحة تاريخياً. إذا لم تكن متأكداً من معلومة ما، اعترف بذلك بدلاً من تقديم معلومات خاطئة.
+2.  **الشمولية والتفصيل:** قدم إجابات شاملة قدر الإمكان، مع ذكر التفاصيل الهامة المتعلقة بالموضوع (مثل: الفترة الزمنية، الشخصيات الرئيسية، الأسباب والنتائج).
+3.  **الأسلوب التفاعلي:** خاطب المستخدم بأسلوب ودود واحترافي. استخدم عبارات مثل "بالتأكيد"، "يسعدني أن أوضح لك"، "من المثير للاهتمام أن تعرف أن...".
+4.  **التعامل مع الأسئلة المتنوعة:** كن مستعداً للإجابة على أسئلة حول:
+    *   الفراعنة (مثل: خوفو، توت عنخ آمون، رمسيس الثاني).
+    *   الحضارة المصرية (مثل: الديانات، الفن، العمارة، العلوم، الكتابة الهيروغليفية).
+    *   المواقع الأثرية الهامة (مثل: الأهرامات، أبو سمبل، الأقصر، وادي الملوك).
+    *   الحياة اليومية للمصريين القدماء (مثل: الزراعة، التجارة، الأسرة، الملابس).
+    *   الأساطير والمعتقدات الدينية.
+5.  **استخدام API:** استخدم الـ API (OpenAI عبر OpenRouter) لتوليد الردود، مع التركيز على استخلاص المعلومات التاريخية الدقيقة وتقديمها بطريقة واضحة.
+6.  **تجنب الخيال غير المدعوم:** لا تخترع معلومات تاريخية. إذا كان السؤال يتطلب تخميناً تاريخياً، اذكر ذلك بوضوح.
+7.  **الاستجابة للأسئلة غير المتعلقة:** إذا طرح المستخدم سؤالاً لا علاقة له بتاريخ مصر القديمة، أعد توجيهه بلطف إلى موضوع البوت الأساسي، مثلاً: "مرحباً! أنا متخصص في تاريخ مصر القديمة. هل لديك أي أسئلة حول هذا الموضوع؟"
+8.  **التحفيز على المزيد من الاستكشاف:** شجع المستخدمين على طرح المزيد من الأسئلة أو استكشاف جوانب أخرى من الحضارة المصرية.`;
+    const botName = "المؤرخ المصري";
+
+    inputElement.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendUserMessage();
+    });
+
+    function appendMessage(text, sender) {
+      const bubble = document.createElement('div');
+      bubble.className = 'flex flex-col max-w-[85%] ' + (sender === 'user' ? 'self-end' : 'self-start');
+      
+      const content = document.createElement('div');
+      content.className = 'px-3 py-2 rounded-2xl text-xs leading-relaxed ' + 
+                        (sender === 'user' ? 'bg-slate-800 text-white rounded-br-none' : 'bg-white text-slate-800 border border-slate-100 rounded-bl-none shadow-sm');
+      if (sender === 'user') {
+        content.style.backgroundColor = '#3b82f6';
+      }
+      content.innerText = text;
+      bubble.appendChild(content);
+      messagesContainer.appendChild(bubble);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function sendPreset(text) {
+      appendMessage(text, 'user');
+      simulateResponse(text);
+    }
+
+    function sendUserMessage() {
+      const val = inputElement.value.trim();
+      if (!val) return;
+      appendMessage(val, 'user');
+      inputElement.value = '';
+      simulateResponse(val);
+    }
+
+    async function simulateResponse(userText) {
+      // Show thinking bubble
+      const thinking = document.createElement('div');
+      thinking.id = 'thinking-indicator';
+      thinking.className = 'flex gap-1 bg-white border border-slate-100 px-3 py-2 rounded-2xl rounded-bl-none shadow-sm max-w-[50px] self-start';
+      thinking.innerHTML = '<span class="h-1.5 w-1.5 bg-slate-400 rounded-full animate-bounce"></span><span class="h-1.5 w-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay:100ms"></span><span class="h-1.5 w-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay:200ms"></span>';
+      messagesContainer.appendChild(thinking);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+      try {
+        const response = await fetch('/api/run-bot-preview', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: [{ sender: 'user', text: userText }],
+            botPrompt: botPrompt,
+            botName: botName
+          })
+        });
+        const data = await response.json();
+        thinking.remove();
+        appendMessage(data.text || 'لا يمكنني الإجابة حالياً.', 'bot');
+      } catch (err) {
+        thinking.remove();
+        appendMessage('عذراً، فشل الاتصال بخادم المعالجة الذكية.', 'bot');
+      }
+    }
+  </script>
+</body>
+</html>
